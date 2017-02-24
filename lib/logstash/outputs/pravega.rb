@@ -6,7 +6,6 @@ require "java"
 require "client"
 require "common"
 require "contract"
-require "service"
 
 class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   declare_threadsafe!
@@ -19,7 +18,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
 
   config :stream_name, :validate => :string, :required => true
 
-  config :scope, :validate => :string, :default => 'seattle'
+  config :scope, :validate => :string, :default => 'global'
 
   config :target_rate, :validate => :number, :default => 100
   
@@ -38,8 +37,14 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   public
   def multi_receive_encoded(encoded)
     encoded.each do |event,data|
-      @producer.writeEvent("",data)
-      logger.debug("write in stream succssfully", :stream_name => @stream_name, :event => data)
+      begin
+        @producer.writeEvent("",data)
+        logger.debug("write in stream succssfully", :stream_name => @stream_name, :event => data)
+      rescue LogStash::ShutdownSignal
+        logger.debug("Pravega producer got shutdown signal")
+      rescue => e
+        logger.warn("Pravega producer threw exception, restarting", :exception => e)
+      end
     end
   end
 
