@@ -6,6 +6,12 @@ require "java"
 require "client"
 require "common"
 require "contract"
+# TODO other pravega dependencies
+require "commons-lang-2.6"
+require "guava-16.0"
+require "libthrift-0.9.1"
+require "netty-all-4.0.36.Final"
+require "slf4j-api-1.7.14"
 
 class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   declare_threadsafe!
