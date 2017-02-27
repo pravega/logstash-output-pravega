@@ -24,7 +24,9 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   
   config :scale_factor, :validate => :number, :default => 1
 
-  config :min_num_segments, :validate => :number, :default =>1
+  config :min_num_segments, :validate => :number, :default => 1
+
+  config :routing_key, :validate => :string, :default => ""
 
 
   public
@@ -38,7 +40,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   def multi_receive_encoded(encoded)
     encoded.each do |event,data|
       begin
-        @producer.writeEvent("",data)
+        @producer.writeEvent(routing_key,data)
         logger.debug("write in stream succssfully", :stream_name => @stream_name, :event => data)
       rescue LogStash::ShutdownSignal
         logger.debug("Pravega producer got shutdown signal")
