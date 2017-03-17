@@ -37,13 +37,13 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
 
   public
   def register
-    create_stream
-    logger.debug("created stream successfully", :stream => @stream_name)
-    @producer = create_producer
   end # def register
 
   public
   def multi_receive_encoded(encoded)
+    create_stream
+    logger.debug("created stream successfully", :stream => @stream_name)
+    @producer = create_producer
     encoded.each do |event,data|
       begin
         @producer.writeEvent(routing_key,data)
