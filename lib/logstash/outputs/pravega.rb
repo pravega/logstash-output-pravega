@@ -2,16 +2,8 @@
 require "logstash/outputs/base"
 require "logstash/namespace"
 require "java"
-# require pravega jar dependencies
-require "client"
-require "common"
-require "contract"
-# TODO other pravega dependencies
-require "commons-lang-2.6"
-require "guava-16.0"
-require "libthrift-0.9.1"
-require "netty-all-4.0.36.Final"
-require "slf4j-api-1.7.14"
+
+require "pravega"
 
 class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   declare_threadsafe!
@@ -26,11 +18,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
 
   config :scope, :validate => :string, :default => 'global'
 
-  config :target_rate, :validate => :number, :default => 100
-  
-  config :scale_factor, :validate => :number, :default => 1
-
-  config :min_num_segments, :validate => :number, :default => 1
+  config :num_of_segments, :validate => :number, :default => 1
 
   config :routing_key, :validate => :string, :default => ""
 
@@ -64,29 +52,30 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   private
   def create_stream
     begin
-      java_import("com.emc.pravega.ClientFactory")
+      java_import("com.emc.pravega.stream.impl.ClientFactoryImpl")
       java_import("com.emc.pravega.StreamManager")
       java_import("com.emc.pravega.stream.ScalingPolicy")
-      java_import("com.emc.pravega.stream.impl.StreamConfigurationImpl")
+      java_import("com.emc.pravega.stream.impl.StreamConfiguration")
+      java_import("com.emc.pravega.stream.impl.netty.ConnectionFactory")
+      java_import("com.emc.pravega.stream.impl.netty.ConnectionFactoryImpl")
+      java_import("com.emc.pravega.stream.impl.ControllerImpl")
       uri = java.net.URI.new(pravega_endpoint)
-      clientFactory = ClientFactory.withScope(scope, uri)
+      controller = ControllerImpl(uri.getHost(), uri.getPort())
+      connectionFactory = connectionFactory.new(false)
+      @clientFactory = new ClientFactoryImpl(scope, controller, connectionFactory)
       streamManager = StreamManager.withScope(scope, uri)
-      policy = ScalingPolicy.new(ScalingPolicy::Type::FIXED_NUM_SEGMENTS, target_rate, scale_factor, min_num_segments)
-      streamManager.createStream(stream_name, StreamConfigurationImpl.new(scope, stream_name, policy))
+      policy = ScalingPolicy.fixed(num_of_segments)
+      config = StreamConfiguration.builder().scope(scope).streamName(stream_name).scalingPolicy(policy).build();
+      streamManager.createStream(stream_name, config)
     end
   end
 
   private
   def create_producer
     begin
-      java_import("com.emc.pravega.ClientFactory")
-      java_import("com.emc.pravega.StreamManager")
       java_import("com.emc.pravega.stream.EventWriterConfig")
       java_import("com.emc.pravega.stream.impl.JavaSerializer")
-      uri = java.net.URI.new(pravega_endpoint)
-      clientFactory = ClientFactory.withScope(scope, uri)
-      streamManager = StreamManager.withScope(scope, uri)
-      writer = clientFactory.createEventWriter(stream_name, JavaSerializer.new(), EventWriterConfig.new(nil))
+      writer = @clientFactory.createEventWriter(stream_name, JavaSerializer.new(), EventWriterConfig.builder().build())
     end
   end
 end # class LogStash::Outputs::Pravega
