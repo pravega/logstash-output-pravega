@@ -25,13 +25,13 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
 
   public
   def register
+    create_stream
+    logger.debug("created stream successfully", :stream => @stream_name)
+    @producer = create_producer
   end # def register
 
   public
   def multi_receive_encoded(encoded)
-    create_stream
-    logger.debug("created stream successfully", :stream => @stream_name)
-    @producer = create_producer
     encoded.each do |event,data|
       begin
         @producer.writeEvent(routing_key,data)
@@ -55,14 +55,14 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       java_import("com.emc.pravega.stream.impl.ClientFactoryImpl")
       java_import("com.emc.pravega.StreamManager")
       java_import("com.emc.pravega.stream.ScalingPolicy")
-      java_import("com.emc.pravega.stream.impl.StreamConfiguration")
-      java_import("com.emc.pravega.stream.impl.netty.ConnectionFactory")
+      java_import("com.emc.pravega.stream.StreamConfiguration")
       java_import("com.emc.pravega.stream.impl.netty.ConnectionFactoryImpl")
       java_import("com.emc.pravega.stream.impl.ControllerImpl")
+      connectionFactory = ConnectionFactoryImpl.new(false)
       uri = java.net.URI.new(pravega_endpoint)
-      controller = ControllerImpl(uri.getHost(), uri.getPort())
-      connectionFactory = connectionFactory.new(false)
-      @clientFactory = new ClientFactoryImpl(scope, controller, connectionFactory)
+      controller = ControllerImpl.new(uri.getHost(), uri.getPort())
+      controller.createScope(scope).get();
+      @clientFactory = ClientFactoryImpl.new(scope, controller, connectionFactory)
       streamManager = StreamManager.withScope(scope, uri)
       policy = ScalingPolicy.fixed(num_of_segments)
       config = StreamConfiguration.builder().scope(scope).streamName(stream_name).scalingPolicy(policy).build();
