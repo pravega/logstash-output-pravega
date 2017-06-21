@@ -52,30 +52,30 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   private
   def create_stream
     begin
-      java_import("com.emc.pravega.stream.impl.ClientFactoryImpl")
-      java_import("com.emc.pravega.StreamManager")
-      java_import("com.emc.pravega.stream.ScalingPolicy")
-      java_import("com.emc.pravega.stream.StreamConfiguration")
-      java_import("com.emc.pravega.stream.impl.netty.ConnectionFactoryImpl")
-      java_import("com.emc.pravega.stream.impl.ControllerImpl")
-      connectionFactory = ConnectionFactoryImpl.new(false)
-      uri = java.net.URI.new(pravega_endpoint)
-      controller = ControllerImpl.new(uri.getHost(), uri.getPort())
-      controller.createScope(scope).get();
-      @clientFactory = ClientFactoryImpl.new(scope, controller, connectionFactory)
-      streamManager = StreamManager.withScope(scope, uri)
-      policy = ScalingPolicy.fixed(num_of_segments)
-      config = StreamConfiguration.builder().scope(scope).streamName(stream_name).scalingPolicy(policy).build();
-      streamManager.createStream(stream_name, config)
+        java_import("io.pravega.client.admin.StreamManager")
+        java_import("io.pravega.client.admin.impl.StreamManagerImpl")
+        java_import("io.pravega.client.stream.impl.Controller")
+        java_import("io.pravega.client.stream.impl.ControllerImpl")
+        java_import("io.pravega.client.stream.ScalingPolicy")
+        java_import("io.pravega.client.stream.StreamConfiguration")
+        uri = java.net.URI.new(pravega_endpoint)
+        streamManager = StreamManager.create(uri)
+        streamManager.createScope(scope)
+        policy = ScalingPolicy.fixed(num_of_segments)
+        streamConfig = StreamConfiguration.builder().scalingPolicy(policy).build()
+        streamManager.createStream(scope, stream_name, streamConfig)
     end
   end
 
   private
   def create_producer
     begin
-      java_import("com.emc.pravega.stream.EventWriterConfig")
-      java_import("com.emc.pravega.stream.impl.JavaSerializer")
-      writer = @clientFactory.createEventWriter(stream_name, JavaSerializer.new(), EventWriterConfig.builder().build())
+        java_import("io.pravega.client.ClientFactory")
+        java_import("io.pravega.client.stream.impl.JavaSerializer")
+        java_import("io.pravega.client.stream.EventWriterConfig")
+        controllerURI = java.net.URI.new(pravega_endpoint)
+        clientFactory = ClientFactory.withScope(scope, controllerURI)
+        writer = clientFactory.createEventWriter(stream_name, JavaSerializer.new(), EventWriterConfig.builder().build()) 
     end
   end
 end # class LogStash::Outputs::Pravega
