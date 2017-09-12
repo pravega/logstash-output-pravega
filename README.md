@@ -15,6 +15,60 @@ Logstash provides infrastructure to automatically generate documentation for thi
 
 Need help? Try #logstash on freenode IRC or the https://discuss.elastic.co/c/logstash discussion forum.
 
+## Usage
+
+- Have JRuby with the Bundler gem and mvn installed
+- Install dependencies
+```sh
+bundle install
+```
+- Install pravega client library
+```sh
+jrake install_jars
+```
+- Build pravega output plugin (`logstash-output-pravega-<version>.gem` shall be generated at project root directory)
+```
+jgem build logstash-output-pravega.gemspec
+```
+- Install plugin: ship `logstash-output-pravega-<version>.gem` to target host where logstash is installed
+```
+logstash-plugin install logstash-output-pravega-<version>.gem
+```
+
+- NOTE: Resolve jar version conflict (only if you also want to use beats plugin). It's a known issue for logstash. To fix it, we need to replace netty-all jar in beats plugin by the one in pravega plugin
+```
+e.g.
+$ pwd
+/usr/local/Cellar/logstash/5.5.2
+$ find . -name netty-all-*.Final.jar
+./libexec/vendor/bundle/jruby/1.9/gems/logstash-input-beats-3.1.23-java/vendor/jar-dependencies/io/netty/netty-all/4.1.3.Final/netty-all-4.1.3.Final.jar
+./libexec/vendor/local_gems/4f0cb3fe/logstash-output-pravega-0.2.0/vendor/jar-dependencies/runtime-jars/netty-all-4.1.8.Final.jar
+
+$ cp ./libexec/vendor/local_gems/4f0cb3fe/logstash-output-pravega-0.2.0/vendor/jar-dependencies/runtime-jars/netty-all-4.1.8.Final.jar ./libexec/vendor/bundle/jruby/1.9/gems/logstash-input-beats-3.1.23-java/vendor/jar-dependencies/io/netty/netty-all/4.1.3.Final/netty-all-4.1.3.Final.jar
+```
+
+- Configration
+```
+e.g.
+output {
+    pravega {
+      pravega_endpoint => "tcp://<host>:<port>"
+      stream_name => "myStream"
+      scope => "myScope"
+    }
+  }
+}
+```
+```
+  # other optional configs
+
+  codec:           default 'json'
+  num_of_segments: default 1
+  routing_key    : default ""
+```
+
+- [Re]start logstash
+
 ## Developing
 
 ### 1. Plugin Developement and Testing
