@@ -2,8 +2,7 @@
 require "logstash/outputs/base"
 require "logstash/namespace"
 require "java"
-
-require "pravega"
+require "logstash-output-pravega_jars.rb"
 
 class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   declare_threadsafe!

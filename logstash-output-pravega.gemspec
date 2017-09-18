@@ -9,12 +9,15 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   # Files
-  s.files = Dir['lib/**/*','spec/**/*','vendor/**/*','*.gemspec','*.md','CONTRIBUTORS','Gemfile','LICENSE','NOTICE.TXT'] + Dir['lib/*.jar']
+  s.files = Dir["lib/**/*.rb","spec/**/*","*.gemspec","*.md","CONTRIBUTORS","Gemfile","LICENSE","NOTICE.TXT", "vendor/jar-dependencies/**/*.jar", "vendor/jar-dependencies/**/*.rb"]
+
    # Tests
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
   # Special flag to let us know this is actually a logstash plugin
   s.metadata = { "logstash_plugin" => "true", "logstash_group" => "output" }
+
+  s.requirements << "jar 'io.pravega:pravega-client', '0.1.0-SNAPSHOT'"
 
   # Gem dependencies
   s.add_runtime_dependency "logstash-core-plugin-api", ">= 1.60", "<= 2.99"
