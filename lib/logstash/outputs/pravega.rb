@@ -21,6 +21,10 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
 
   config :routing_key, :validate => :string, :default => ""
 
+  config :username, :validate => :string, :default => ""
+
+  config :password, :validate => :string, :default => ""
+
 
   public
   def register
@@ -57,8 +61,15 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
         java_import("io.pravega.client.stream.impl.ControllerImpl")
         java_import("io.pravega.client.stream.ScalingPolicy")
         java_import("io.pravega.client.stream.StreamConfiguration")
+        java_import("io.pravega.client.ClientConfig")
+        java_import("io.pravega.client.stream.impl.DefaultCredentials")
         uri = java.net.URI.new(pravega_endpoint)
-        streamManager = StreamManager.create(uri)
+        clientConfig = ClientConfig.builder()
+                                   .controllerURI(uri)
+                                   .credentials(DefaultCredentials.new(password, username))
+                                   .validateHostName(false)
+                                   .build()
+        streamManager = StreamManager.create(clientConfig)
         streamManager.createScope(scope)
         policy = ScalingPolicy.fixed(num_of_segments)
         streamConfig = StreamConfiguration.builder().scalingPolicy(policy).build()
@@ -72,8 +83,13 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
         java_import("io.pravega.client.ClientFactory")
         java_import("io.pravega.client.stream.impl.JavaSerializer")
         java_import("io.pravega.client.stream.EventWriterConfig")
-        controllerURI = java.net.URI.new(pravega_endpoint)
-        clientFactory = ClientFactory.withScope(scope, controllerURI)
+        uri = java.net.URI.new(pravega_endpoint)
+        clientConfig = ClientConfig.builder()
+                                   .controllerURI(uri)
+                                   .credentials(DefaultCredentials.new(password, username))
+                                   .validateHostName(false)
+                                   .build()
+        clientFactory = ClientFactory.withScope(scope, clientConfig)
         writer = clientFactory.createEventWriter(stream_name, JavaSerializer.new(), EventWriterConfig.builder().build()) 
     end
   end
