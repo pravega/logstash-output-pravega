@@ -55,6 +55,8 @@ output {
       pravega_endpoint => "tcp://<host>:<port>"
       stream_name => "myStream"
       scope => "myScope"
+      #username => "admin"
+      #password => "1111_aaaa"
     }
   }
 }
