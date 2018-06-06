@@ -8,14 +8,10 @@
     <dependency>
       <groupId>io.pravega</groupId>
       <artifactId>pravega-client</artifactId>
-      <version>0.3.0-64.d0c8497-SNAPSHOT</version>
+      <version>0.3.0-1870.f56b52d-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <repositories>
-    <repository>
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </repository>
     <repository>
       <id>jfrog</id>
       <url>https://oss.jfrog.org/artifactory/jfrog-dependencies</url>
