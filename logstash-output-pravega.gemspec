@@ -17,7 +17,11 @@ Gem::Specification.new do |s|
   # Special flag to let us know this is actually a logstash plugin
   s.metadata = { "logstash_plugin" => "true", "logstash_group" => "output" }
 
+<<<<<<< 73ed59e81122aa3049beace3f3c2a02914518a80
   s.requirements << "jar 'io.pravega:pravega-client', '0.3.0'"
+=======
+  s.requirements << "jar 'io.pravega:pravega-client', '0.3.0-1870.f56b52d-SNAPSHOT'"
+>>>>>>> Add docker build to help set up logstash pipeline
 
   # Gem dependencies
   s.add_runtime_dependency "logstash-core-plugin-api", ">= 1.60", "<= 2.99"

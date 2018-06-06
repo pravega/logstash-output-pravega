@@ -13,10 +13,6 @@
   </dependencies>
   <repositories>
     <repository>
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </repository>
-    <repository>
       <id>jfrog</id>
       <url>https://oss.jfrog.org/artifactory/jfrog-dependencies</url>
     </repository>

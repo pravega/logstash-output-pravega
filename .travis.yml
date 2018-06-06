@@ -1,0 +1,7 @@
+language: ruby
+rvm:
+  - jruby
+script:
+  - bundle install
+  - rake install_jars
+  - jgem build logstash-output-pravega.gemspec
