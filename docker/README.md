@@ -11,10 +11,11 @@ Services running inside the container.
 - Pravega standalone. See more details [here](http://pravega.io/docs/latest/getting-started/)
 - Logstash with [Pravega output plugin](https://github.com/pravega/logstash-output-pravega). It is configured to read data from a file that contains Apache access logs and push the logs, by default, to Pravega standalone running inside the container. 
 
-To build with tag, e.g., pravega-demo
+To build, first pick a [pravega standalone version](https://oss.jfrog.org/artifactory/jfrog-dependencies/io/pravega/pravega-standalone), for example, 0.3.0-1870.f56b52d-SNAPSHOT. Then pick a [plugin release](https://github.com/pravega/logstash-output-pravega/releases), e.g., 0.3.0-SNAPSHOT
 ```
-$ docker build --rm=true -t pravega-demo .
+$ docker build --build-arg PRAVEGA_VERSION=0.3.0-1870.f56b52d-SNAPSHOT --build-arg PLUGIN_VERSION=0.3.0-SNAPSHOT -t pravega-demo .
 ```
+
 To run the pipeline, first create a file at /tmp/access.log
 ```
 $ touch /tmp/access.log
