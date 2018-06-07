@@ -15,6 +15,6 @@ export PRAVEGA_VERSION=`grep pravega-client ../logstash-output-pravega.gemspec  
 
 export PLUGIN_VERSION=`grep s.version ../logstash-output-pravega.gemspec  | awk -F"'" '{print $2}'`
 
-#docker build --build-arg PRAVEGA_VERSION=${PRAVEGA_VERSION} --build-arg PLUGIN_VERSION=0.3.0-SNAPSHOT -t $IMAGE_NAME .
+docker build --build-arg PRAVEGA_VERSION=${PRAVEGA_VERSION} --build-arg PLUGIN_VERSION=0.3.0-SNAPSHOT -t $IMAGE_NAME .
 
 echo "------ HOOK END - BUILD -------"
