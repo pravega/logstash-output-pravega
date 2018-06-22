@@ -26,24 +26,21 @@ RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add 
     rm -rf /var/cache/apt/* && rm -rf /var/lib/apt/lists/* && rm -rf ~/.cache && rm -rf /usr/share/doc
 
 # Pravega package and version
-#pravega-standalone-0.3.0-1870.f56b52d-20180604.195330-9.tgz
-ARG PRAVEGA_VERSION=0.3.0-1870.f56b52d
-ARG PRAVEGA_BUILD=20180604.195330-9
-ENV PRAVEGA_PREFIX=pravega-standalone
-#pravega-standalone-0.3.0-1870.f56b52d-20180604.195330-9.tgz
-ENV PRAVEGA_PACKAGE=${PRAVEGA_PREFIX}-${PRAVEGA_VERSION}-${PRAVEGA_BUILD}.tgz
-#pravega-standalone-0.3.0-1870.f56b52d-SNAPSHOT
-ENV PRAVEGA_PATH=${PRAVEGA_VERSION}-SNAPSHOT
+ARG PRAVEGA_VERSION=0.3.0
+
+# TODO: update whe Pravega 0.3.0 is released
+ARG PRAVEGA_TAG=v0.3.0-rc0
+ENV PRAVEGA_PACKAGE=pravega-${PRAVEGA_VERSION}
 
 # Logstash Pravega output plugin version
-ARG PLUGIN_VERSION=0.3.0-SNAPSHOT
+ARG PLUGIN_VERSION=0.3.0
 
 # Install Pravega
 RUN cd /opt && \
-    wget --no-check-certificate https://oss.jfrog.org/artifactory/jfrog-dependencies/io/pravega/pravega-standalone/${PRAVEGA_PATH}/${PRAVEGA_PACKAGE} && \
-    tar zxvf ${PRAVEGA_PACKAGE} && \
-    ln -s /opt/${PRAVEGA_PREFIX}-${PRAVEGA_PATH} /opt/pravega && \
-    rm -rf /opt/${PRAVEGA_PACKAGE}
+    wget --no-check-certificate https://github.com/pravega/pravega/releases/download/${PRAVEGA_TAG}/${PRAVEGA_PACKAGE}.tgz && \
+    tar zxvf ${PRAVEGA_PACKAGE}.tgz && \
+    ln -s /opt/${PRAVEGA_PACKAGE} /opt/pravega && \
+    rm -rf /opt/${PRAVEGA_PACKAGE}.tgz
 
 # Install logstash Pravega output plugin
 RUN cd /opt && \
