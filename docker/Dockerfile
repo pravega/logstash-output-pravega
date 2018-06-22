@@ -37,7 +37,7 @@ ARG PLUGIN_VERSION=0.3.0
 
 # Install Pravega
 RUN cd /opt && \
-    wget --no-check-certificate https://github.com/pravega/pravega/releases/download/${PRAVEGA_TAG}/${PRAVEGA_PACKAGE}.tgz && \
+    wget --no-check-certificate https://github.com/pravega/logstash-output-pravega/releases/download/${PRAVEGA_TAG}/${PRAVEGA_PACKAGE}.tgz && \
     tar zxvf ${PRAVEGA_PACKAGE}.tgz && \
     ln -s /opt/${PRAVEGA_PACKAGE} /opt/pravega && \
     rm -rf /opt/${PRAVEGA_PACKAGE}.tgz
