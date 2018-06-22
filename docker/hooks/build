@@ -9,9 +9,12 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 
+set -vuex
 echo "------ HOOK START - BUILD -------"
-printenv
+export PRAVEGA_VERSION=`grep pravega-client ../logstash-output-pravega.gemspec  | awk -F"'" '{print $4}'`
 
-docker build --build-arg PRAVEGA_VERSION=0.3.0-1870.f56b52dd --build-arg PLUGIN_VERSION=0.3.0-SNAPSHOT -t $IMAGE_NAME .
+export PLUGIN_VERSION=`grep s.version ../logstash-output-pravega.gemspec  | awk -F"'" '{print $2}'`
+
+docker build --build-arg PRAVEGA_VERSION=${PRAVEGA_VERSION} --build-arg PLUGIN_VERSION=0.3.0-SNAPSHOT -t $IMAGE_NAME .
 
 echo "------ HOOK END - BUILD -------"
