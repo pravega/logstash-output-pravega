@@ -8,7 +8,7 @@
     <dependency>
       <groupId>io.pravega</groupId>
       <artifactId>pravega-client</artifactId>
-      <version>0.3.0-64.d0c8497-SNAPSHOT</version>
+      <version>0.3.0-50.fe10b1d-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <repositories>
