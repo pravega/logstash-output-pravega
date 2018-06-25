@@ -27,9 +27,7 @@ RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add 
 
 # Pravega package and version
 ARG PRAVEGA_VERSION=0.3.0
-
-# TODO: update whe Pravega 0.3.0 is released
-ARG PRAVEGA_TAG=v0.3.0-rc0
+ARG PRAVEGA_TAG=v0.3.0
 ENV PRAVEGA_PACKAGE=pravega-${PRAVEGA_VERSION}
 
 # Logstash Pravega output plugin version
