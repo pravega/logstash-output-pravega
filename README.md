@@ -1,4 +1,4 @@
-# Logstash Plugin
+# Logstash Output Pravage Plugin
 
 This is a plugin for [Logstash](https://github.com/elastic/logstash).
 
@@ -11,42 +11,46 @@ Logstash provides infrastructure to automatically generate documentation for thi
 - For formatting code or config example, you can use the asciidoc `[source,ruby]` directive
 - For more asciidoc formatting tips, see the excellent reference here https://github.com/elastic/docs#asciidoc-guide
 
+The logstash-output-pravega plugin is upgraded to version: 0.4.0. It can be used to write data to [pravage-0.4.0](https://github.com/pravega/pravega/releases).
+
 ## Need Help?
 
 Need help? Try #logstash on freenode IRC or the https://discuss.elastic.co/c/logstash discussion forum.
 
 ## Usage
+- First, have rvm installed. Take how to install it on ubuntu-18~18.04.1 for example. For other OS, find it's installation in [rvm install](https://rvm.io/rvm/install)
+```sh
+sudo apt-get install software-properties-common
+sudo apt-add-repository -y ppa:rael-gc/rvm
+sudo apt-get update
+sudo apt-get install -y rvm
+```
 
-- Have JRuby with the Bundler gem and mvn installed
+- Have JRuby with the Bundler gem and mvn installed. It's suggested to install the latest version jrbuy as the old version has bugs.
+```sh
+rvm install jruby-9.1.17.0
+rvm use jruby-9.1.17.0
+gem install bundler
+```
+
 - Install dependencies
 ```sh
 bundle install
 ```
+
 - Install pravega client library
 ```sh
-jrake install_jars
+gem install rake
+rake install_jars
 ```
 - Build pravega output plugin (`logstash-output-pravega-<version>.gem` shall be generated at project root directory)
-```
-jgem build logstash-output-pravega.gemspec
+```sh
+gem build logstash-output-pravega.gemspec
 ```
 - Install plugin: ship `logstash-output-pravega-<version>.gem` to target host where logstash is installed
+```sh
+sudo bin/logstash-plugin install logstash-output-pravega-<version>.gem
 ```
-logstash-plugin install logstash-output-pravega-<version>.gem
-```
-
-- NOTE: Resolve jar version conflict (only if you also want to use beats plugin). It's a known issue for logstash. To fix it, we need to replace netty-all jar in beats plugin by the one in pravega plugin
-```
-e.g.
-$ pwd
-/usr/local/Cellar/logstash/5.5.2
-$ find . -name netty-all-*.Final.jar
-./libexec/vendor/bundle/jruby/1.9/gems/logstash-input-beats-3.1.23-java/vendor/jar-dependencies/io/netty/netty-all/4.1.3.Final/netty-all-4.1.3.Final.jar
-./libexec/vendor/local_gems/4f0cb3fe/logstash-output-pravega-0.2.0/vendor/jar-dependencies/runtime-jars/netty-all-4.1.8.Final.jar
-
-$ cp ./libexec/vendor/local_gems/4f0cb3fe/logstash-output-pravega-0.2.0/vendor/jar-dependencies/runtime-jars/netty-all-4.1.8.Final.jar ./libexec/vendor/bundle/jruby/1.9/gems/logstash-input-beats-3.1.23-java/vendor/jar-dependencies/io/netty/netty-all/4.1.3.Final/netty-all-4.1.3.Final.jar
-```
-
 - Configration
 ```
 e.g.
@@ -54,22 +58,21 @@ output {
     pravega {
       pravega_endpoint => "tcp://<host>:<port>"
       stream_name => "myStream"
-      scope => "myScope"
-      #username => "admin"
-      #password => "1111_aaaa"
     }
   }
 }
 ```
 ```
-  # other optional configs
+  # other optional configs. When the controller authorization of pravega is open, the usename and password is required.
 
-  codec:           default 'json'
-  num_of_segments: default 1
-  routing_key    : default ""
+      scope:             default: 'global'
+      num_of_segments:   default: 1
+      routing_key:       default: ""
+      username:          default: ""
+      password:          default: ""
 ```
 
-- [Re]start logstash
+- Restart logstash
 
 ## Developing
 
@@ -88,13 +91,11 @@ bundle install
 #### Test
 
 - Update your dependencies
-
 ```sh
 bundle install
 ```
 
 - Run tests
-
 ```sh
 bundle exec rspec
 ```
