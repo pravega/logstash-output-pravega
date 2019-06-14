@@ -26,24 +26,27 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
 
   config :password, :validate => :string, :default => ""
 
+
   public
   def register
+     @producer = create_producer
   end # def register
 
   public
   def multi_receive_encoded(encoded)
-    pre_check(encoded)
-    @producer = create_producer
     encoded.each do |event,data|
       begin
         @producer.writeEvent(routing_key,data)
-	logger.debug("write in stream succssfully", :stream_name => @stream_name, :event => data)
+        logger.debug("write in stream succssfully", :stream_name => @stream_name, :event => data)
       rescue LogStash::ShutdownSignal
         logger.debug("Pravega producer got shutdown signal")
       rescue => e
         logger.warn("Pravega producer threw exception, restarting", :exception => e)
       end
     end
+  end
+
+  def close
     @producer.close()
   end
 
@@ -57,8 +60,8 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
     encoded.each do |event, data|
       if @stream_name == JSON.parse(data)['streamName']
         @stream_name = "newOutputStream-".concat(SecureRandom.uuid)
-	logger.info("The input stream_name shouldn't be equal to output, the new output_stream is created", :stream_name => @stream_name)
-	break
+        logger.info("The input stream_name shouldn't be equal to output, the new output_stream is created", :stream_name => @stream_name)
+        break
       end
     end
     logger.debug("After arugument preCheck ", :num_of_segments => @num_of_segments, :stream_name => @stream_name)
@@ -73,7 +76,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       java_import("io.pravega.client.ClientConfig")
       java_import("io.pravega.client.stream.impl.DefaultCredentials")
       java_import("io.pravega.client.ClientFactory")
-      java_import("io.pravega.client.stream.impl.JavaSerializer")
+      java_import("io.pravega.client.stream.impl.UTF8StringSerializer")
       java_import("io.pravega.client.stream.EventWriterConfig")
 
       uri = java.net.URI.new(pravega_endpoint)
@@ -90,7 +93,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       logger.debug("created stream successfully", :stream => @stream_name)
 
       clientFactory = ClientFactory.withScope(scope, clientConfig)
-      writer = clientFactory.createEventWriter(stream_name, JavaSerializer.new(), EventWriterConfig.builder().build())
+      writer = clientFactory.createEventWriter(stream_name, UTF8StringSerializer.new(), EventWriterConfig.builder().build())
     end
   end
 end # class LogStash::Outputs::Pravega
