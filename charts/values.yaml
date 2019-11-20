@@ -1,0 +1,12 @@
+apiVersion: v1
+appVersion: "1.0"
+description: logstash pravega
+name: logstash-pravega
+version: 0.0.1
+nautilus@nautilus:~/NautilusDellIT/logstash-pravega-nautilus$ cat charts/values.yaml
+image:
+  repository: logstash-pravega
+  tag: 0.6.0
+
+pravega:
+  controller: "tcp://nautilus-pravega-controller.nautilus-pravega.svc.cluster.local:9090"

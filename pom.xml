@@ -1,13 +1,46 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>dummy</groupId>
-  <artifactId>dummy</artifactId>
-  <version>0.0.0</version>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>dummy</groupId>
+   <artifactId>dummy</artifactId>
+   <version>0.0.0</version>
+   <properties>
+     <keycloak-credentials-version>0.6.0</keycloak-credentials-version>
+     <pravegaVersion>0.6.0</pravegaVersion>
+   </properties>
+   <repositories>
+      <repository>
+	<id>central</id>
+	 <name>Maven Central</name>
+	<url>http://central.maven.org/maven2/</url>
+	<releases>
+	<enabled>true</enabled>
+	</releases>
+	<snapshots>
+	<enabled>true</enabled>
+        </snapshots>
+      </repository>
+      <repository>
+      <id>JFrog</id>
+      <name>JFrog</name>
+      <url>https://oss.jfrog.org/artifactory/jfrog-dependencies</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+       <enabled>true</enabled>
+     </snapshots>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>io.pravega</groupId>
       <artifactId>pravega-client</artifactId>
+      <version>0.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.pravega</groupId>
+      <artifactId>pravega-keycloak-client</artifactId>
       <version>0.6.0</version>
     </dependency>
   </dependencies>

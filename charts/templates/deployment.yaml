@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash-pravega
+  labels:
+    app: nautilus-demo
+    component: logstash-pravega
+    release: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: nautilus-demo
+      component: logstash-pravega
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: nautilus-demo
+        component: logstash-pravega
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccount: {{ .Release.Namespace }}-pravega
+      containers:
+        - name: main
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 514
+              name: tcp
+              protocol: TCP
+          env:
+            - name: PRAVEGA_CONTROLLER
+              value: "{{ .Values.pravega.controller }}"
+            - name: JAVA_OPTS
+              value: "-XshowSettings:vm -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1"
+          resources:
+            requests:
+              memory: "10Gi"
+              cpu: "1000m"
+            limits:
+              memory: "11Gi"
+              cpu: "2000m"

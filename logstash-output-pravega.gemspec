@@ -16,9 +16,8 @@ Gem::Specification.new do |s|
 
   # Special flag to let us know this is actually a logstash plugin
   s.metadata = { "logstash_plugin" => "true", "logstash_group" => "output" }
-
   s.requirements << "jar 'io.pravega:pravega-client', '0.6.0'"
-
+  s.requirements << "jar 'io.pravega:pravega-keycloak-client', '0.6.0'"
   # Gem dependencies
   s.add_runtime_dependency "logstash-core-plugin-api", ">= 1.60", "<= 2.99"
   s.add_runtime_dependency 'logstash-codec-plain', '>= 0'
