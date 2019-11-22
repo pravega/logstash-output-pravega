@@ -132,6 +132,23 @@ bin/logstash-plugin install /your/local/plugin/logstash-filter-awesome.gem
 ```
 - Start Logstash and proceed to test the plugin
 
+#### 2.3 Run it in K8S
+
+- Build your plugin gem
+- build docker image and push it to your docker registry
+```sh
+export DOCKER_REPOSITORY=mydockerregitry.com
+docker build -t ${DOCKER_REPOSITORY}/logstash-pravega:0.6.0 .
+docker push  ${DOCKER_REPOSITORY}/logstash-pravega:0.6.0
+```
+- Deploy it to K8S using helm install
+```
+helm upgrade --install logstash-pravega \
+     --namespace mynamespace  -f charts/values.yaml \
+     --set image.repository=${DOCKER_REPOSITORY}/logstash-pravega\
+     --set image.tag=0.6.0 stable/logstash
+```
+
 ## Contributing
 
 All contributions are welcome: ideas, patches, documentation, bug reports, complaints, and even something you drew up on a napkin.
