@@ -144,7 +144,7 @@ docker push  ${DOCKER_REPOSITORY}/logstash-pravega:0.6.0
 - Deploy it to K8S using helm install
 ```
 helm upgrade --install logstash-pravega \
-     --namespace mynamespace  -f charts/values.yaml \
+     --namespace mynamespace  charts/logstash/ \
      --set image.repository=${DOCKER_REPOSITORY}/logstash-pravega\
      --set image.tag=0.6.0 stable/logstash
 ```
