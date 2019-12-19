@@ -146,7 +146,7 @@ docker push  ${DOCKER_REPOSITORY}/logstash-pravega:0.6.0
 helm upgrade --install logstash-pravega \
      --namespace mynamespace  charts/logstash/ \
      --set image.repository=${DOCKER_REPOSITORY}/logstash-pravega\
-     --set image.tag=0.6.0 stable/logstash
+     --set image.tag=0.6.0
 ```
 
 ## Contributing
