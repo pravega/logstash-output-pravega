@@ -29,6 +29,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
 
   public
   def register
+     @clientFactory = get_client_factory
      @producer = create_producer
   end # def register
 
@@ -47,28 +48,12 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   end
 
   def close
+    @clientFactory.close()
     @producer.close()
   end
 
   private
-  def pre_check(encoded)
-    # If the num_of_segment <= 0, the IllegalArgumentException will be thrown and logstash will stop.
-    @num_of_segments = 1 if @num_of_segments <= 0
-
-    # If the input stream name is same as output, it will filter the formatted json data again and again without endless.
-    # So, the new output streamName needs to be created
-    encoded.each do |event, data|
-      if @stream_name == JSON.parse(data)['streamName']
-        @stream_name = "newOutputStream-".concat(SecureRandom.uuid)
-        logger.info("The input stream_name shouldn't be equal to output, the new output_stream is created", :stream_name => @stream_name)
-        break
-      end
-    end
-    logger.debug("After arugument preCheck ", :num_of_segments => @num_of_segments, :stream_name => @stream_name)
-  end
-
-  private
-  def create_producer
+  def get_client_factory
     begin
       java_import("io.pravega.client.admin.StreamManager")
       java_import("io.pravega.client.stream.ScalingPolicy")
@@ -89,9 +74,15 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       streamConfig = StreamConfiguration.builder().scalingPolicy(policy).build()
       streamManager.createStream(scope, stream_name, streamConfig)
       logger.debug("created stream successfully", :stream => @stream_name)
-
+      streamManager.close()
       clientFactory = ClientFactory.withScope(scope, clientConfig)
-      writer = clientFactory.createEventWriter(stream_name, UTF8StringSerializer.new(), EventWriterConfig.builder().build())
+
+  private
+  def create_producer
+    begin
+      java_import("io.pravega.client.stream.impl.UTF8StringSerializer")
+      java_import("io.pravega.client.stream.EventWriterConfig")
+      writer = @clientFactory.createEventWriter(stream_name, UTF8StringSerializer.new(), EventWriterConfig.builder().build())
     end
   end
 end # class LogStash::Outputs::Pravega
