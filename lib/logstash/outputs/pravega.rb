@@ -48,8 +48,8 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
   end
 
   def close
-    @clientFactory.close()
     @producer.close()
+    @clientFactory.close()
   end
 
   private
