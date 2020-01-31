@@ -11,8 +11,6 @@ Logstash provides infrastructure to automatically generate documentation for thi
 - For formatting code or config example, you can use the asciidoc `[source,ruby]` directive
 - For more asciidoc formatting tips, see the excellent reference here https://github.com/elastic/docs#asciidoc-guide
 
-The logstash-output-pravega plugin is upgraded to version: 0.4.0. It can be used to write data to [pravage-0.4.0](https://github.com/pravega/pravega/releases).
-
 ## Need Help?
 
 Need help? Try #logstash on freenode IRC or the https://discuss.elastic.co/c/logstash discussion forum.
@@ -131,6 +129,23 @@ gem build logstash-filter-awesome.gemspec
 bin/logstash-plugin install /your/local/plugin/logstash-filter-awesome.gem
 ```
 - Start Logstash and proceed to test the plugin
+
+#### 2.3 Run it in K8S
+
+- Build your plugin gem
+- build docker image and push it to your docker registry
+```sh
+export DOCKER_REPOSITORY=mydockerregitry.com
+docker build -t ${DOCKER_REPOSITORY}/logstash-pravega:0.6.0 .
+docker push  ${DOCKER_REPOSITORY}/logstash-pravega:0.6.0
+```
+- Deploy it to K8S using helm install
+```
+helm upgrade --install logstash-pravega \
+     --namespace mynamespace  charts/logstash/ \
+     --set image.repository=${DOCKER_REPOSITORY}/logstash-pravega\
+     --set image.tag=0.6.0
+```
 
 ## Contributing
 
