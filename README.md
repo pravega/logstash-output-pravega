@@ -11,6 +11,8 @@ Logstash provides infrastructure to automatically generate documentation for thi
 - For formatting code or config example, you can use the asciidoc `[source,ruby]` directive
 - For more asciidoc formatting tips, see the excellent reference here https://github.com/elastic/docs#asciidoc-guide
 
+The logstash-output-pravega plugin is upgraded to version: 0.7.0. It can be used to write data to [pravage-0.7.0](https://github.com/pravega/pravega/releases).
+
 ## Need Help?
 
 Need help? Try #logstash on freenode IRC or the https://discuss.elastic.co/c/logstash discussion forum.
@@ -22,6 +24,13 @@ sudo apt-get install software-properties-common
 sudo apt-add-repository -y ppa:rael-gc/rvm
 sudo apt-get update
 sudo apt-get install -y rvm
+```
+
+- Install maven
+```sh
+sudo apt update
+sudo apt install maven
+sudo mvn -version
 ```
 
 - Have JRuby with the Bundler gem and mvn installed. It's suggested to install the latest version jrbuy as the old version has bugs.
