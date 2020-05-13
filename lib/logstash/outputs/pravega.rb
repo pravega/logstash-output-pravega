@@ -72,7 +72,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       java_import("io.pravega.client.stream.StreamConfiguration")
       java_import("io.pravega.client.ClientConfig")
       java_import("io.pravega.client.stream.impl.DefaultCredentials")
-      java_import("io.pravega.client.ClientFactory")
+      java_import("io.pravega.client.EventStreamClientFactory")
       java_import("io.pravega.client.stream.impl.JavaSerializer")
       java_import("io.pravega.client.stream.EventWriterConfig")
 
@@ -89,7 +89,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       streamManager.createStream(scope, stream_name, streamConfig)
       logger.debug("created stream successfully", :stream => @stream_name)
 
-      clientFactory = ClientFactory.withScope(scope, clientConfig)
+      clientFactory = EventStreamClientFactory.withScope(scope, clientConfig)
       writer = clientFactory.createEventWriter(stream_name, JavaSerializer.new(), EventWriterConfig.builder().build())
     end
   end
