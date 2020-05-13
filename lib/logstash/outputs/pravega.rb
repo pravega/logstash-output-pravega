@@ -60,8 +60,8 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       java_import("io.pravega.client.stream.StreamConfiguration")
       java_import("io.pravega.client.ClientConfig")
       java_import("io.pravega.client.stream.impl.DefaultCredentials")
-      java_import("io.pravega.client.ClientFactory")
-      java_import("io.pravega.client.stream.impl.UTF8StringSerializer")
+      java_import("io.pravega.client.EventStreamClientFactory")
+      java_import("io.pravega.client.stream.impl.JavaSerializer")
       java_import("io.pravega.client.stream.EventWriterConfig")
 
       uri = java.net.URI.new(pravega_endpoint)
@@ -70,19 +70,19 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
                                  .validateHostName(false)
                                  .build()
       streamManager = StreamManager.create(clientConfig)
+      streamManager.createScope(scope)
       policy = ScalingPolicy.fixed(@num_of_segments)
       streamConfig = StreamConfiguration.builder().scalingPolicy(policy).build()
       streamManager.createStream(scope, stream_name, streamConfig)
       logger.debug("created stream successfully", :stream => @stream_name)
-      streamManager.close()
-      clientFactory = ClientFactory.withScope(scope, clientConfig)
+      clientFactory = EventStreamClientFactory.withScope(scope, clientConfig)
+   end
+  end
 
   private
   def create_producer
     begin
-      java_import("io.pravega.client.stream.impl.UTF8StringSerializer")
-      java_import("io.pravega.client.stream.EventWriterConfig")
-      writer = @clientFactory.createEventWriter(stream_name, UTF8StringSerializer.new(), EventWriterConfig.builder().build())
+      writer = @clientFactory.createEventWriter(stream_name, JavaSerializer.new(), EventWriterConfig.builder().build())
     end
   end
 end # class LogStash::Outputs::Pravega
