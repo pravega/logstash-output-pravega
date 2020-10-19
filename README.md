@@ -1,4 +1,4 @@
-# Logstash Output Pravage Plugin
+# Logstash Output Pravega Plugin
 
 This is a plugin for [Logstash](https://github.com/elastic/logstash).
 
@@ -11,7 +11,7 @@ Logstash provides infrastructure to automatically generate documentation for thi
 - For formatting code or config example, you can use the asciidoc `[source,ruby]` directive
 - For more asciidoc formatting tips, see the excellent reference here https://github.com/elastic/docs#asciidoc-guide
 
-The logstash-output-pravega plugin is upgraded to version: 0.7.0. It can be used to write data to [pravage-0.7.0](https://github.com/pravega/pravega/releases).
+The logstash-output-pravega plugin is upgraded to version: 0.8.0. It can be used to write data to [pravega-0.8.0](https://github.com/pravega/pravega/releases).
 
 ## Need Help?
 
