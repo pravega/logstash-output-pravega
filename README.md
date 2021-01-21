@@ -64,11 +64,18 @@ e.g.
 output {
     pravega {
       pravega_endpoint => "tcp://<host>:<port>"
+      create_scope => false
+      scope => "demo"
       stream_name => "myStream"
     }
   }
 }
 ```
+- Add ENVIRONMENT Variables
+export pravega_client_auth_method=Bearer
+export pravega_client_auth_loadDynamic=true 
+export KEYCLOAK_SERVICE_ACCOUNT_FILE=/PATH_TO_KEYCLOAK_FILE/keycloak-demo.json
+
 ```
   # other optional configs. When the controller authorization of pravega is open, the usename and password is required.
 
