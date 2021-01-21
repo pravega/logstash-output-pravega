@@ -14,6 +14,8 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
 
   config :pravega_endpoint, :validate => :string, :require => true
 
+  config :create_scope, :validate => :boolean, :require => true
+
   config :stream_name, :validate => :string, :required => true
 
   config :scope, :validate => :string, :default => 'global'
@@ -46,7 +48,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       end
     end
   end
-
+  
   def close
     @producer.close()
     @clientFactory.close()
@@ -63,14 +65,19 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       java_import("io.pravega.client.EventStreamClientFactory")
       java_import("io.pravega.client.stream.impl.UTF8StringSerializer")
       java_import("io.pravega.client.stream.EventWriterConfig")
+      java_import("io.pravega.keycloak.client.KeycloakAuthzClient")
 
       uri = java.net.URI.new(pravega_endpoint)
+      @create_scope = create_scope
       clientConfig = ClientConfig.builder()
                                  .controllerURI(uri)
-                                 .validateHostName(false)
                                  .build()
       streamManager = StreamManager.create(clientConfig)
-      streamManager.createScope(scope)
+      
+      if @create_scope
+              streamManager.createScope(scope)
+      end
+
       policy = ScalingPolicy.fixed(@num_of_segments)
       streamConfig = StreamConfiguration.builder().scalingPolicy(policy).build()
       streamManager.createStream(scope, stream_name, streamConfig)
@@ -78,7 +85,7 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       clientFactory = EventStreamClientFactory.withScope(scope, clientConfig)
    end
   end
-
+  
   private
   def create_producer
     begin
