@@ -12,7 +12,7 @@
       <repository>
 	<id>central</id>
 	 <name>Maven Central</name>
-	<url>http://central.maven.org/maven2/</url>
+	<url>https://repo.maven.apache.org/maven2/</url>
 	<releases>
 	<enabled>true</enabled>
 	</releases>
