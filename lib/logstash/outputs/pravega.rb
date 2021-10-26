@@ -65,7 +65,6 @@ class LogStash::Outputs::Pravega < LogStash::Outputs::Base
       java_import("io.pravega.client.EventStreamClientFactory")
       java_import("io.pravega.client.stream.impl.UTF8StringSerializer")
       java_import("io.pravega.client.stream.EventWriterConfig")
-      java_import("io.pravega.keycloak.client.KeycloakAuthzClient")
 
       uri = java.net.URI.new(pravega_endpoint)
       @create_scope = create_scope
