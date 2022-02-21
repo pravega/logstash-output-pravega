@@ -30,6 +30,7 @@ spec:
         checksum/patterns: {{ include (print $.Template.BasePath "/patterns-config.yaml") . | sha256sum }}
         checksum/templates: {{ include (print $.Template.BasePath "/files-config.yaml") . | sha256sum }}
         checksum/pipeline: {{ include (print $.Template.BasePath "/pipeline-config.yaml") . | sha256sum }}
+        nautilus.dellemc.com/pravega-environment: "{{ .Release.Namespace }}-pravega"
       {{- if .Values.podAnnotations }}
         ## Custom pod annotations
         {{- range $key, $value := .Values.podAnnotations }}
@@ -141,7 +142,7 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-      serviceAccountName: {{ template "logstash.serviceAccountName" . }}
+    #serviceAccountName: {{ template "logstash.serviceAccountName" . }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       volumes:
         - name: patterns

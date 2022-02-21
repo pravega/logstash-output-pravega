@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 2
 
 podDisruptionBudget:
   maxUnavailable: 1
@@ -15,7 +15,7 @@ image:
   #    - name: "myKubernetesSecret"
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   # clusterIP: None
   # nodePort:
   # Set this to local, to preserve client source ip.  Default stripes out the source ip
@@ -31,13 +31,13 @@ service:
     #   targetPort: syslog-udp
     #   protocol: UDP
     syslog-tcp:
-       port: 1514
-       targetPort: syslog-tcp
-       protocol: TCP
-       #beats:
-       #  port: 5044
-       #  targetPort: beats
-       # protocol: TCP
+      port: 1514
+      targetPort: syslog-tcp
+      protocol: TCP
+      #beats:
+      #port: 5044
+      #targetPort: beats
+      #protocol: TCP
     # http:
     #  port: 8080
     #  targetPort: http
@@ -46,15 +46,15 @@ service:
     # loadBalancerSourceRanges:
     #   - 192.168.0.1
 ports:
-  # - name: syslog-udp
-  #   containerPort: 1514
-  #   protocol: UDP
-  - name: syslog-tcp
-    containerPort: 1514
-    protocol: TCP
-    #- name: beats
-    #containerPort: 5044
-    #protocol: TCP
+        #- name: syslog-udp
+        #containerPort: 1514
+        #protocol: UDP
+    - name: syslog-tcp
+      containerPort: 1514
+      protocol: TCP
+        #- name: beats
+        #containerPort: 5044
+        #protocol: TCP
   # - name: http
   #   containerPort: 8080
   #   protocol: TCP
@@ -115,7 +115,9 @@ podLabels: {}
   # team: "developers"
   # service: "logstash"
 
-extraEnv: []
+extraEnv:
+  - name: JAVA_HOME
+    value: "/usr/share/logstash/jdk"
 
 extraInitContainers: []
   # - name: echo
@@ -131,7 +133,7 @@ livenessProbe:
   httpGet:
     path: /
     port: monitor
-  initialDelaySeconds: 20
+  initialDelaySeconds: 40
   # periodSeconds: 30
   # timeoutSeconds: 30
   # failureThreshold: 6
@@ -141,7 +143,7 @@ readinessProbe:
   httpGet:
     path: /
     port: monitor
-  initialDelaySeconds: 20
+  initialDelaySeconds: 40
   # periodSeconds: 30
   # timeoutSeconds: 30
   # failureThreshold: 6
@@ -156,7 +158,7 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "-"
+  storageClass: "nfs"
   accessMode: ReadWriteOnce
   size: 2Gi
 
@@ -289,12 +291,14 @@ inputs:
       #   type => syslog
       # }
       tcp {
-        port => 1514
-        type => syslog
+       port => 1514
+       type => syslog
       }
       #beats {
       #  port => 5044
       #}
+      #
+
       # http {
       #   port => 8080
       # }
@@ -309,20 +313,29 @@ inputs:
     }
 
 filters:
-  # main: |-
-  #   filter {
-  #   }
+   main: |-
+     filter {
+       grok {
+          match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} %{DATA:request_id} %{IP:ecs_node}:%{NUMBER:ecs_node_port} %{IP:client}:%{NUMBER:client_port} ((?<user>[^-]{1}[^\s]*)|-) ((?<uri>[^-]{1}[^\s]*)|-) %{WORD:method} ((?<namespace>[^-]{1}[^\s]*)|-) ((?<bucket>[^-]{1}[^\s]*)|-) ((?<key>[^-]{1}[^\s]*)|-) ((?<query>[^-]{1}[^\s]*)|-) HTTP/%{BASE16FLOAT:http_version} %{NUMBER:response_code:int} %{NUMBER:time-taken:int} (%{NUMBER:upload-size:int}|-) (%{NUMBER:download-size:int}|-) %{NUMBER:storage_processing:int}" }
+        }
+ 
+        if "_grokparsefailure" in [tags] {
+               drop { }
+          }
+     }
 
 outputs:
   main: |-
     output {
+      stdout { codec => rubydebug }
       pravega {
-        pravega_endpoint => "tcp://localhost:9090"
-        stream_name => "<changeme>"
-        scope => "<changeme>"
+        pravega_endpoint => "tls://pravega-controller.sdp.sdp-ecs.log-analytics.com:443"
+        stream_name => "test-app-stream"
+        scope => "test-app"
+        create_scope => false
         codec => json { charset => "UTF-8" }
         }
-      # stdout { codec => rubydebug }
+        #stdout { codec => rubydebug }
       # elasticsearch {
       #  hosts => ["${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
       #  manage_template => false
@@ -336,10 +349,10 @@ outputs:
       #   topic_id => "destination"
       # }
     }
-
+    
 serviceAccount:
   # Specifies whether a ServiceAccount should be created
-  create: false
+  create: true`
   # The name of the ServiceAccount to use.
   # If not set and create is true, a name is generated using the fullname template
   name: serviceaccount

@@ -156,6 +156,8 @@ docker build -t ${DOCKER_REPOSITORY}/logstash-pravega:0.6.0 .
 docker push  ${DOCKER_REPOSITORY}/logstash-pravega:0.6.0
 ```
 - Deploy it to K8S using helm install
+edit charts/logstash/values.yaml for SDP cluster pravega controller, scope and stream
+and also configure logstash conf for inputs,filters and output
 ```
 helm upgrade --install logstash-pravega \
      --namespace mynamespace  charts/logstash/ \
