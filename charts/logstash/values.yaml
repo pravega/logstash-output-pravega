@@ -117,7 +117,7 @@ podLabels: {}
 
 extraEnv:
   - name: JAVA_HOME
-    value: "jdk"
+    value: "/usr/share/logstash/jdk"
 
 extraInitContainers: []
   # - name: echo
@@ -329,9 +329,9 @@ outputs:
     output {
       stdout { codec => rubydebug }
       pravega {
-        pravega_endpoint => "tls://pravega-controller.ecs.sdp-analytics.com:443"
-        stream_name => "ecs-logs-stream"
-        scope => "ecs-logs"
+        pravega_endpoint => "tls://pravega-controller.sdp.sdp-ecs.log-analytics.com:443"
+        stream_name => "test-app-stream"
+        scope => "test-app"
         create_scope => false
         codec => json { charset => "UTF-8" }
         }
