@@ -68,7 +68,6 @@ output {
       scope => "demo"
       stream_name => "myStream"
     }
-  }
 }
 ```
 - Add ENVIRONMENT Variables
